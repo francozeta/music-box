@@ -8,7 +8,13 @@ export default {
 
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        'blue': '#3863D2',
+        'purple': '#522BC0',
+        'red': '#EC6565'
+      }
+    },
   },
   plugins: [],
 }
