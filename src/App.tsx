@@ -1,14 +1,14 @@
 import './App.css'
-
 import LoginPage from './pages/LoginPage'
+import { Routes, Route } from "react-router-dom"
 
 function App() {
 
   return (
-    <>
-      <h1>Music Box</h1>
-      <LoginPage />
-    </>
+    <Routes>
+      <Route path="/" element={ <h1>Inicio</h1> } />
+      <Route path="/login" element={<LoginPage />} />
+    </Routes>
   )
 }
 

@@ -1,3 +1,7 @@
+## Requerimientos
+
+- Node v22.8.0
+
 ## Getting Started
 
 First, run the development server:
