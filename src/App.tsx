@@ -1,16 +1,19 @@
 import './App.css'
-import Layout from './components/layout/layout'
-import HomePage from './pages/HomePage'
+import { ThemeProvider } from '../context/theme-provider'
 import LoginPage from './pages/LoginPage'
 import { Routes, Route } from "react-router-dom"
+import LandingPage from './pages/LandingPage'
 
 function App() {
-
   return (
-    <Routes>
-      <Route path="/" element={<Layout><HomePage /></Layout>} />
-      <Route path="/login" element={<LoginPage />} />
-    </Routes>
+    <ThemeProvider defaultTheme='light' storageKey='vite-ui-theme'>
+      <Routes>
+        <Route path="/" element={
+          <LandingPage />
+        }/>
+        <Route path="/login" element={<LoginPage />} />
+      </Routes>
+    </ThemeProvider>
   )
 }
 
