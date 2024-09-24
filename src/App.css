@@ -5,3 +5,7 @@
 #root {
     width: 100%;
 }
+
+.radial-gradient {
+    background: radial-gradient(circle, #1E3A8A 5%, #111827 90%);
+}
