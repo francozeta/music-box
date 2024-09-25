@@ -1,7 +1,7 @@
-import React from "react"
+
 import MusicCard from "../components/musicCard"
 
-const InicioPage = () => {
+const HomePage = () => {
     return (
         <div className="bg-black w-full p-4">
             <h1>Inicio </h1>
@@ -10,4 +10,4 @@ const InicioPage = () => {
     )
 }
 
-export default InicioPage
+export default HomePage
