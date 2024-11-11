@@ -8,14 +8,11 @@ async function Page() {
   if (!user) return null
 
   const userInfo = await fetchUser(user.id)
-  if (userInfo?.onboarded) redirect("/");
-
-  // ✖️ ERROR: Is unable to update the imageUrl because the url is not found in database
-  // ✖️ ERROR: Is unable retry entering the current path because the path is on Error by server: [ Server ] Error: Failed to fetch user: Cannot populate path `Communities` because it is not in your schema. Set the `strictPopulate` option to false to override.
+  /* if (userInfo?.onboarded) redirect("/"); */
 
   const userData = {
     id: user.id,
-    objectId: userInfo?._id,
+    objectId: userInfo?._id.toString() ?? '',
     username: userInfo ? userInfo?.username : user.username,
     name: userInfo ? userInfo?.name : user.firstName ?? "",
     bio: userInfo ? userInfo?.bio : "",

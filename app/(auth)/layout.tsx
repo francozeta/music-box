@@ -17,7 +17,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Authentication | MusicBox",
+  title: "Onboarding | MusicBox",
   description: "App dedicated to music reviewers",
 };
 
