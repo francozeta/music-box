@@ -1,8 +1,8 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   experimental: {
-    serverComponentsExternalPackages: ["moongose"]
+    serverComponentsExternalPackages: ['moongose']
   },
   eslint: {
     ignoreDuringBuilds: true
@@ -13,24 +13,28 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: "https",
-        hostname: "img.clerk.com",
+        protocol: 'https',
+        hostname: 'img.clerk.com',
       },
       {
-        protocol: "https",
-        hostname: "images.clerk.dev",
+        protocol: 'https',
+        hostname: 'images.clerk.dev',
       },
       {
-        protocol: "https",
-        hostname: "uploadthing.com",
+        protocol: 'https',
+        hostname: 'uploadthing.com',
       },
       {
-        protocol: "https",
-        hostname: "placehold.co",
+        protocol: 'https',
+        hostname: 'placehold.co',
       },
       {
-        protocol: "https",
-        hostname: "media.istockphoto.com",
+        protocol: 'https',
+        hostname: 'media.istockphoto.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'ueqblalkhpevswboftls.supabase.co',
       }
     ]
   }
