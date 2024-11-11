@@ -38,7 +38,7 @@ export default function RootLayout({
     >
       <html lang="en">
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          className={`${geistSans.variable} ${geistMono.variable} antialiased `}
         >
           <Topbar />
           <main className='flex flex-row'>
