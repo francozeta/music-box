@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form'
 
 import { UserValidation } from '@/lib/validations/user'
 import { useUploadThing } from '@/lib/uploadthing'
-import { isBase64Image } from '@/lib/utils'
+import { convertBlobUrlToFile, isBase64Image } from '@/lib/utils'
 import { updateUser } from '@/lib/actions/user.actions'
 
 import * as z from 'zod'
@@ -18,6 +18,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { Textarea } from '../ui/textarea'
+import { uploadImage } from '@/lib/supabase/storage/client'
 
 interface Props {
   user: {
@@ -34,9 +35,7 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
   const router = useRouter()
   const pathname = usePathname()
 
-  const { startUpload } = useUploadThing('media')
-
-  const [files, setFiles] = useState<File[]>([])
+  const [imageUrls, setimageUrls] = useState<string[]>([])
 
   const form = useForm<z.infer<typeof UserValidation>>({
     resolver: zodResolver(UserValidation),
@@ -48,21 +47,44 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
     },
   })
 
-  const onSubmit = async (values: z.infer<typeof UserValidation>) => {
-    // NOTE: Cannot connect to the server by default with UploadThing ***_tofix***
-    try {
-      const blob = values.profile_photo
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const filesArray = Array.from(e.target.files)
+      const newImageUrls = filesArray.map((file) => URL.createObjectURL(file))
+      setimageUrls([...imageUrls, ...newImageUrls])
+    }
+  }
 
-      const hasImageChanged = isBase64Image(blob)
-      if (hasImageChanged) {
-        const imgRes = await startUpload(files)
-        console.log('Upload reponse:', imgRes)
-
-        if (imgRes && imgRes[0].url) {
-          values.profile_photo = imgRes[0].url
-        }
-
+  const handleClickUploadImagesButton = async (): Promise<string[]> => {
+    const urls: string[] = []
+    for (const url of imageUrls) {
+      const imageFile = await convertBlobUrlToFile(url)
+      const { imageUrl, error } = await uploadImage({
+        file: imageFile,
+        bucket: 'images-musicbox'
+      })
+      if (error) {
+        console.error('Error uploading image:', error)
+        return []
       }
+      urls.push(imageUrl)
+    }
+    console.log('Profile photo uploaded: ', urls)
+    setimageUrls([]) // Reset after uploading
+    return urls
+  }
+
+  const onSubmit = async (values: z.infer<typeof UserValidation>) => {
+    // NOTE: Using now Supabase Storage 
+    try {
+      const uploadedUrls = await handleClickUploadImagesButton()
+
+      if (uploadedUrls.length === 0) {
+        console.error('Error uploading images')
+        return
+      }
+
+      values.profile_photo = uploadedUrls[0]
 
       // ***TODO*** Update user profile: DONE✅
       await updateUser({
@@ -84,32 +106,6 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
     }
   }
 
-  const handleImage = (
-    e: ChangeEvent<HTMLInputElement>,
-    fieldChange: (value: string) => void
-
-  ) => {
-    e.preventDefault()
-
-    const fileReader = new FileReader()
-
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0]
-      setFiles(Array.from(e.target.files))
-
-      if (!file.type.includes('image')) return
-
-      fileReader.onload = async (event) => {
-        const imageDataUrl = event.target?.result?.toString() || ''
-        fieldChange(imageDataUrl)
-      }
-
-      fileReader.readAsDataURL(file)
-    }
-
-
-  }
-
   return (
     <Form {...form}>
       <form
@@ -123,9 +119,18 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
             <FormItem className="flex flex-col items-center gap-4">
               <FormLabel className="relative cursor-pointer group">
                 <div className="relative size-24">
-                  {field.value ? (
+                  {imageUrls.length > 0 ? (
                     <Image
-                      src={field.value}
+                      src={imageUrls[0]}
+                      alt="profile_icon"
+                      fill
+                      priority
+                      className="rounded-full object-cover"
+                      {...field}
+                    />
+                  ) : field.value ? (
+                    <Image
+                      src={field.value} // Show the current profile image if it exists and is not selected another image
                       alt="profile_icon"
                       fill
                       priority
@@ -142,7 +147,7 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
                     type="file"
                     accept="image/*"
                     className="hidden"
-                    onChange={(e) => handleImage(e, field.onChange)}
+                    onChange={handleImageChange}
                   />
                 </FormControl>
               </FormLabel>
