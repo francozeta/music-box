@@ -13,7 +13,7 @@ export async function fetchUser(userId: string) {
     await connectToDB()
 
     return await User.findOne({ id: userId }).populate({
-      path: 'Communities',
+      path: 'communities',
       model: Community
     })
   } catch (err) {

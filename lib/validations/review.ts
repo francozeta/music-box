@@ -25,7 +25,7 @@ export const ReviewValidation = z.object({
     .min(1, { message: 'Select a rating between 1 and 5.' })
     .max(5),
   listenedBefore: z.boolean().default(false),
-  image: z.string()
+  image: z.string().optional()
 })
 
 export const CommentValidation = z.object({
