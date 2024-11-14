@@ -34,7 +34,7 @@ export function formatDateString(dateString: string) {
 // created by chatgpt
 export function formatReviewCount(count: number): string {
   if (count === 0) {
-    return "No Threads";
+    return "No Reviews";
   } else {
     const ReviewCount = count.toString().padStart(2, "0");
     const ReviewWord = count === 1 ? "Review" : "Reviews";

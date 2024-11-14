@@ -10,12 +10,16 @@ const ReviewSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  createdAt: {
-    type: Date,
-    default: Date.now
+  community: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Community",
   },
   parentId: {
     type: String,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
   },
   songTitle: {
     type: String,
