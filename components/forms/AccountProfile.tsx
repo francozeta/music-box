@@ -6,19 +6,21 @@ import { ChangeEvent, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { UserValidation } from '@/lib/validations/user'
-import { useUploadThing } from '@/lib/uploadthing'
-import { convertBlobUrlToFile, isBase64Image } from '@/lib/utils'
+import { convertBlobUrlToFile } from '@/lib/utils'
 import { updateUser } from '@/lib/actions/user.actions'
 
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Camera, User } from '@geist-ui/icons'
+import { User } from '@geist-ui/icons'
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { Textarea } from '../ui/textarea'
 import { uploadImage } from '@/lib/supabase/storage/client'
+
+//New Update Clerk Profile Image
+import { useUser } from '@clerk/nextjs'
 
 interface Props {
   user: {
@@ -37,6 +39,10 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
 
   const [imageUrls, setimageUrls] = useState<string[]>([])
 
+  //New Update Clerk Profile Image
+  const { user: clerkUser } = useUser()
+
+
   const form = useForm<z.infer<typeof UserValidation>>({
     resolver: zodResolver(UserValidation),
     defaultValues: {
@@ -47,52 +53,54 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
     },
   })
 
-  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const filesArray = Array.from(e.target.files)
-      const newImageUrls = filesArray.map((file) => URL.createObjectURL(file))
-      setimageUrls([...imageUrls, ...newImageUrls])
-    }
-  }
+  const handleImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0]
+      const imageUrl = URL.createObjectURL(file)
+      setimageUrls([imageUrl])
 
-  const handleClickUploadImagesButton = async (): Promise<string[]> => {
-    const urls: string[] = []
-    for (const url of imageUrls) {
-      const imageFile = await convertBlobUrlToFile(url)
-      const { imageUrl, error } = await uploadImage({
-        file: imageFile,
-        bucket: 'images-musicbox'
-      })
-      if (error) {
-        console.error('Error uploading image:', error)
-        return []
+      // Update Clerk user's profile image
+      try {
+        const formData = new FormData()
+        formData.append('file', file)
+        await clerkUser?.setProfileImage({ file })
+        console.log('Profile image updated in Clerk')
+      } catch (error) {
+        console.error('Error updating profile image in Clerk:', error)
       }
-      urls.push(imageUrl)
     }
-    console.log('Profile photo uploaded: ', urls)
-    setimageUrls([]) // Reset after uploading
-    return urls
   }
 
   const onSubmit = async (values: z.infer<typeof UserValidation>) => {
-    // NOTE: Using now Supabase Storage 
     try {
-      const uploadedUrls = await handleClickUploadImagesButton()
+      let profileImageUrl = values.profile_photo
 
-      if (uploadedUrls.length === 0) {
-        console.error('Error uploading images')
-        return
+      if (imageUrls.length > 0) {
+        const imageFile = await convertBlobUrlToFile(imageUrls[0])
+        const { imageUrl, error } = await uploadImage({
+          file: imageFile,
+          bucket: 'images-musicbox'
+        })
+        if (error) {
+          console.error('Error uploading image:', error)
+          return
+        }
+        profileImageUrl = imageUrl
       }
 
-      values.profile_photo = uploadedUrls[0]
+      try {
+        await clerkUser?.update({ username: values.username })
+        console.log('Username updated in Clerk!')
+      } catch (err) {
+        console.error('Error updating username in Clerk:', err)
+      }
 
-      // ***TODO*** Update user profile: DONE✅
       await updateUser({
         userId: user.id,
         username: values.username,
         name: values.name,
         bio: values.bio,
-        image: values.profile_photo,
+        image: profileImageUrl,
         path: pathname,
       })
 
