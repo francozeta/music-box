@@ -18,6 +18,7 @@ export async function fetchPosts(pageNumber = 1, pageSize = 20) {
     .sort({ createdAt: 'desc' })
     .skip(skipAmount)
     .limit(pageSize)
+    .select('image songTitle artist rating createdAt text') // remove text from review model
     .populate({
       path: 'author',
       model: User
