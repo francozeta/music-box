@@ -66,7 +66,6 @@ function ReviewCard({
 }: Props) {
   /* [ Server ] Error: Maximum call stack size exceeded: DONE! */
 
-
   return (
     <Card className="w-full max-w-2xl bg-zinc-900 border-zinc-700 ">
       <CardHeader className="flex flex-row items-center gap-4">

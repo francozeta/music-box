@@ -168,7 +168,7 @@ export async function getActivity(userId: string) {
 
     // Collect all the child review ids (replies) from the 'children' field of each user thread
     const childReviewIds = userReviews.reduce((acc, userReview) => {
-      return acc.concact(userReview.children)
+      return acc.concat(userReview.children)
     }, [])
 
     // Find and return the child threads (replies) excluding the ones created by the same user

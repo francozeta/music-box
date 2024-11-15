@@ -2,10 +2,11 @@
 import Link from 'next/link'
 import { LogOut } from '@geist-ui/icons'
 import { sidebarLinks } from '@/constants'
-import { SignedIn, SignOutButton } from '@clerk/nextjs'
+import { SignedIn, SignOutButton, useUser } from '@clerk/nextjs'
 import { usePathname } from 'next/navigation'
 
 const LeftSidebar = () => {
+  const user = useUser().user
   const pathname = usePathname()
   return (
     <section className='custom-scrollbar leftsidebar'>
@@ -13,7 +14,7 @@ const LeftSidebar = () => {
         {sidebarLinks.map((link) => {
           const isActive = (pathname.includes(link.route) && link.route.length > 1) ||
             pathname === link.route
-          /* if(link.route === '/profile') link.route = `${link.route}/${userId}` */ // TODO: Add userId
+          if (link.route === '/profile') link.route = `${link.route}/${user?.id}` // TODO: Add userId
 
           return (
             <Link
