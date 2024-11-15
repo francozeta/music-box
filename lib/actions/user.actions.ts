@@ -71,6 +71,12 @@ export async function fetchUserPosts(userId: string) {
       path: 'reviews',
       model: Review,
       populate: [
+        // NEW: In the query, we populate the author field to get the necessary details.
+        {
+          path: 'author', // Este es el campo que contiene el ID del autor
+          model: User,
+          select: 'name image id', // Incluye los subcampos necesarios
+        },
         {
           path: 'community',
           model: Community,
