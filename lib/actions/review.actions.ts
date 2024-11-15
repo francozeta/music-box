@@ -1,6 +1,6 @@
 'use server'
 
-import { connectToDB } from '../mongoose' 
+import { connectToDB } from '../mongoose'
 import { revalidatePath } from 'next/cache'
 
 import User from '../models/user.model'
@@ -8,43 +8,50 @@ import Review from '../models/review.model'
 import Community from '../models/community.model'
 
 export async function fetchPosts(pageNumber = 1, pageSize = 20) {
-  connectToDB()
+  try {
+    connectToDB()
 
-  // Calculate the number of posts to skip based on the page number and page size.
-  const skipAmount = (pageNumber - 1) * pageSize
+    // Calculate the number of posts to skip based on the page number and page size.
+    const skipAmount = (pageNumber - 1) * pageSize
 
-  // Create a query to fetch the posts that have no parent (top-level threads) (a thread that is not a comment/reply).
-  const postQuery = Review.find({ parentId: { $in: [null, undefined] } })
-    .sort({ createdAt: 'desc' })
-    .skip(skipAmount)
-    .limit(pageSize)
-    .select('image songTitle artist rating createdAt text') // remove text from review model
-    .populate({
-      path: 'author',
-      model: User
-    })
-    .populate({
-      path: 'community',
-      model: Community,
-    })
-    .populate({
-      path: 'children',  // Populate the children field
-      populate: {
-        path: 'author', // Populate the author field within children
-        model: User,
-        select: '_id name parentId image' // Select only _id and username fields of the author
-      }
-    })
-  // Count the total number of top-level posts (reviews) i.e., reviews that are not comments.
-  const totalPostCount = await Review.countDocuments({
-    parentId: { $in: [null, undefined] },
-  }) // Get the total count of posts
+    // Create a query to fetch the posts that have no parent (top-level threads) (a thread that is not a comment/reply).
+    const postQuery = Review.find({ parentId: { $in: [null, undefined] } })
+      .sort({ createdAt: 'desc' })
+      .skip(skipAmount)
+      .limit(pageSize)
+      .select('image songTitle artist rating createdAt text') // remove text from review model
+      .populate({
+        path: 'author',
+        model: User
+      })
+      .populate({
+        path: 'community',
+        model: Community,
+      })
+      .populate({
+        path: 'children',  // Populate the children field
+        populate: {
+          path: 'author', // Populate the author field within children
+          model: User,
+          select: '_id name parentId image' // Select only _id and username fields of the author
+        }
+      })
+    // Count the total number of top-level posts (reviews) i.e., reviews that are not comments.
+    const totalPostCount = await Review.countDocuments({
+      parentId: { $in: [null, undefined] },
+    }) // Get the total count of posts
 
-  const posts = await postQuery.exec()
+    const posts = await postQuery.exec()
 
-  const isNext = totalPostCount > skipAmount + posts.length
+    const isNext = totalPostCount > skipAmount + posts.length
 
-  return { posts, isNext }
+    return { posts, isNext }
+  } catch (err) {
+    //@ts-expect-error ***err.message***
+    console.error(`Error while fetching posts: ${err.message}`)
+    throw new Error('Unable to fetch posts')
+
+  }
 }
 
 interface Params {
@@ -109,7 +116,7 @@ export async function createReview({
       revalidatePath(path)
 
       /* return { success: true, reviewId: createdReview._id }*/
-}
+    }
   } catch (err) {
     //@ts-expect-error ***err.message***
     throw new Error(`Failed to create review: ${err.message}`)
