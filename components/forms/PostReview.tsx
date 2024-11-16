@@ -46,7 +46,7 @@ export default function PostReview({ userId }: Props) {
   const { organization } = useOrganization()
 
 
-  const [imageUrls, setimageUrls] = useState<string[]>([]);
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
 
 
   const form = useForm<z.infer<typeof ReviewValidation>>({
@@ -66,49 +66,32 @@ export default function PostReview({ userId }: Props) {
   const { watch } = form
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const filesArray = Array.from(e.target.files)
-      const newImageUrls = filesArray.map((file) => URL.createObjectURL(file))
-
-      setimageUrls([...imageUrls, ...newImageUrls])
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0]
+      const imageUrl = URL.createObjectURL(file)
+      setImageUrls([imageUrl])
+      form.setValue('image', imageUrl) // Set the image value in the form
     }
   }
 
-  const handleClickUploadImagesButton = async (): Promise<string[]> => {
+  const onSubmit = async (values: z.infer<typeof ReviewValidation>) => {
+    try {
+      if (imageUrls.length === 0) {
+        form.setError('image', { type: 'manual', message: 'Image is required' })
+        return
+      }
 
-    let urls = []
-    for (const url of imageUrls) {
-      const imageFile = await convertBlobUrlToFile(url)
-
+      const imageFile = await convertBlobUrlToFile(imageUrls[0])
       const { imageUrl, error } = await uploadImage({
         file: imageFile,
         bucket: 'images-musicbox'
       })
 
       if (error) {
-        console.error(error)
-        return []
-      }
-      urls.push(imageUrl)
-    }
-    console.log(urls)
-    setimageUrls([])
-    // new***
-    return urls
-
-  }
-
-  const onSubmit = async (values: z.infer<typeof ReviewValidation>) => {
-    try {
-      // new***
-      const uploadedUrls = await handleClickUploadImagesButton()
-
-      if (uploadedUrls.length === 0) {
-        console.error('Error uploading images')
+        console.error('Error uploading image:', error)
+        form.setError('image', { type: 'manual', message: 'Failed to upload image' })
         return
       }
-
-      values.image = uploadedUrls.join(',')
 
       const result = await createReview({
         text: values.review,
@@ -120,17 +103,15 @@ export default function PostReview({ userId }: Props) {
         rating: values.rating,
         listenedBefore: values.listenedBefore,
         dateListened: values.dateListened,
-        image: values.image,
-      });
+        image: imageUrl,
+      })
 
       console.log('Review creation result:', result)
-
       router.push('/')
     } catch (error) {
       console.error('Error creating review:', error)
     }
   }
-
   return (
     <Form {...form}>
       <form
@@ -300,18 +281,14 @@ export default function PostReview({ userId }: Props) {
                       onChange={handleImageChange}
                     />
                     {imageUrls.length > 0 ? (
-                      <div>
-                        {imageUrls.map((url, index) => (
-                          <div key={index} className="relative w-12 h-12 rounded-md overflow-hidden">
-                            <Image
-                              key={index}
-                              src={url}
-                              alt="Preview"
-                              className="object-cover"
-                              fill
-                            />
-                          </div>
-                        ))}
+                      <div className="relative w-12 h-12 rounded-md overflow-hidden">
+                        <Image
+                          src={imageUrls[0]}
+                          alt="Preview"
+                          className="object-cover"
+                          fill
+                          {...field}
+                        />
                       </div>
                     ) : (
                       <div className="w-12 h-12 rounded-md bg-zinc-700 flex items-center justify-center">
@@ -323,6 +300,7 @@ export default function PostReview({ userId }: Props) {
                     </span>
                   </div>
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
