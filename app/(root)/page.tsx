@@ -1,4 +1,5 @@
 import ReviewCard from '@/components/cards/ReviewCard';
+import Pagination from '@/components/shared/Pagination';
 import { fetchPosts } from '@/lib/actions/review.actions';
 import { fetchUser } from '@/lib/actions/user.actions';
 import { currentUser } from '@clerk/nextjs/server';
@@ -53,7 +54,11 @@ export default async function Home(
           </>
         )}
       </section>
-      {/* ***Pagination *** */}
+      <Pagination
+        path='/'
+        pageNumber={searchParams?.page ? +searchParams.page : 1}
+        isNext={result.isNext}
+      />
 
     </>
 
