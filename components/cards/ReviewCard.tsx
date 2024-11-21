@@ -11,9 +11,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { deleteReview } from '@/lib/actions/review.actions';
-import { usePathname, useRouter } from 'next/navigation';
-import { useCallback } from 'react';
+import DeleteReview from '../forms/DeleteReview';
+
 
 
 
@@ -97,10 +96,12 @@ function ReviewCard({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="bg-zinc-800 border-zinc-700">
             {currentUserId === author.id && (
-              <DropdownMenuItem className='text-red-500'>
-                <Trash2 />
-                Delete
-              </DropdownMenuItem>
+              <DeleteReview
+                reviewId={JSON.stringify(id)}
+                currentUserId={currentUserId}
+                authorId={author.id}
+                parentId={parentId}
+              />
             )}
           </DropdownMenuContent>
         </DropdownMenu>
