@@ -8,19 +8,21 @@ import { usePathname } from 'next/navigation'
 const LeftSidebar = () => {
   const user = useUser().user
   const pathname = usePathname()
+
+  console.log(user?.id)
   return (
     <section className='custom-scrollbar leftsidebar'>
       <div className="flex w-full flex-1 flex-col gap-6 px-6">
         {sidebarLinks.map((link) => {
           const isActive = (pathname.includes(link.route) && link.route.length > 1) ||
             pathname === link.route
-          if (link.route === '/profile') link.route = `${link.route}/${user?.id}` // TODO: Add userId
+          const linkRoute = link.route === '/profile' ? `${link.route}/${user?.id}` : link.route // TODO: Add userId
 
           return (
             <Link
               key={link.label}
-              href={link.route}
-              className={`leftsidebar_link ${isActive && 'bg-primary-500'}`} // Active Color link
+              href={linkRoute}
+              className={`leftsidebar_link ${isActive ? 'bg-primary-500' : ''}`} // Active Color link
             >
               <link.icon color='white' size={24} />
               <p className="text-light-1 max-lg:hidden">{link.label}</p>

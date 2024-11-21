@@ -16,7 +16,7 @@ export const ReviewValidation = z.object({
     .string()
     .nonempty({ message: 'Review text is required' })
     .min(3, { message: 'Minimum 3 characters.' })
-    .max(500, { message: 'Maximum 500 characters' }),
+    .max(150, { message: 'Maximum 150 characters' }),
   dateListened: z.date().refine((val) => !!val, {
     message: 'Select a date',
   }),
