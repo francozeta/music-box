@@ -12,6 +12,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import DeleteReview from '../forms/DeleteReview';
+import FooterReview from './FooterReview';
 
 
 
@@ -64,7 +65,6 @@ function ReviewCard({
   image
 }: Props) {
   /* [ Server ] Error: Maximum call stack size exceeded: DONE! */
-  console.log('Author IMAGE:', author.image)
 
   return (
     <Card className="w-full max-w-2xl bg-zinc-900 border-zinc-700 ">
@@ -132,51 +132,7 @@ function ReviewCard({
         </div>
       </CardContent>
       <CardFooter className="flex justify-between">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-muted-foreground hover:bg-zinc-900  hover:text-zinc-100">
-                <Heart className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Like</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-        <Link href={`/review/${id}`}>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-muted-foreground hover:bg-zinc-900  hover:text-zinc-100">
-                  <MessageCircle className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Comment</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </Link>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-muted-foreground hover:bg-zinc-900 hover:text-zinc-100">
-                <Repeat className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Repost</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-muted-foreground hover:bg-zinc-900  hover:text-zinc-100">
-                <Send className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Share</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <FooterReview id={id} commentsCount={comments.length} />
       </CardFooter>
     </Card>
   );
