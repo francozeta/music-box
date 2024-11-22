@@ -42,16 +42,16 @@ async function Page(props: { params: Promise<{ id: string }> }) {
             ))}
           </TabsList>
           {profileTabs.map((tab) => (
-            <TabsContent
-              key={`content-${tab.label}`}
-              value={tab.value}
-              className='w-full text-light-1'
-            >
-              <ReviewsTab
-                currentUserId={user.id}
-                accountId={userInfo.id}
-                accountType='User'
-              />
+            <TabsContent key={`content-${tab.label}`} value={tab.value} className='w-full text-light-1'>
+              {tab.value === 'reviews' && (
+                <ReviewsTab currentUserId={user.id} accountId={userInfo.id} accountType='User' />
+              )}
+              {tab.value === 'replies' && (
+                <ReviewsTab currentUserId={user.id} accountId={userInfo.id} accountType='User' />
+              )}
+              {tab.value === 'reposts' && (
+                <ReviewsTab currentUserId={user.id} accountId={userInfo.id} accountType='User' />
+              )}
             </TabsContent>
           ))}
         </Tabs>
