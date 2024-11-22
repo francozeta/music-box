@@ -1,3 +1,4 @@
+import { CommentCard } from '@/components/cards/CommentCard'
 import ReviewCard from '@/components/cards/ReviewCard'
 import Comment from '@/components/forms/Comment'
 import { fetchReviewById } from '@/lib/actions/review.actions'
@@ -48,25 +49,16 @@ async function Page(props: { params: Promise<{ id: string }> }) {
         />
       </div>
 
-    {/* // TODO: INTERFACE CommentChildItem */}
+      {/* // TODO: INTERFACE CommentChildItem */}
       <div className="mt-10">
         {review.children.map((childItem: any) => (
-          <>
-            <div
-              key={childItem._id}
-            >
-              <Image
-                src={childItem.author.image}
-                alt='Review image'
-                width={120}
-                height={120}
-              />
-              <p>{childItem.text}</p>
-            </div>
-            <div>
-              <p>{childItem.author.name}</p>
-            </div>
-          </>
+          <CommentCard
+            key={childItem._id}
+            id={childItem._id}
+            author={childItem.author}
+            text={childItem.text}
+            createdAt={childItem.createdAt}
+          />
         ))}
       </div>
     </section>
