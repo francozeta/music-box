@@ -252,7 +252,13 @@ export async function addCommentToReview(
     const commentReview = new Review({
       text: commentText,
       author: userId,
-      parentId: reviewId // Set the parentId to the original thread's ID
+      parentId: reviewId, // Set the parentId to the original thread's ID
+      songTitle: 'CommentChild', // Add default values for required fields
+      artist: 'N/A',
+      rating: 0,
+      listenedBefore: false,
+      dateListened: new Date(),
+      image: ''
     })
 
     // Save the comment review to the database 

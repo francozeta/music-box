@@ -64,6 +64,7 @@ function ReviewCard({
   image
 }: Props) {
   /* [ Server ] Error: Maximum call stack size exceeded: DONE! */
+  console.log('Author IMAGE:', author.image)
 
   return (
     <Card className="w-full max-w-2xl bg-zinc-900 border-zinc-700 ">

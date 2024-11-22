@@ -24,8 +24,13 @@ function DeleteReview({
   if (currentUserId !== authorId) return null /* || pathname === '/' */
 
   const handleDelete = async () => {
-    await deleteReview(JSON.parse(reviewId), pathname)
-    if (!parentId) router.push('/')
+    try {
+      await deleteReview(JSON.parse(reviewId), pathname)
+      if (!parentId) router.push('/')
+        
+    } catch (err) {
+      console.error('Error deleting review: ', err)
+    }
   }
 
 
