@@ -132,7 +132,7 @@ function ReviewCard({
         </div>
       </CardContent>
       <CardFooter className="flex justify-between">
-        <FooterReview id={id} commentsCount={comments.length} />
+        <FooterReview id={id.toString()} commentsCount={comments.length} />
       </CardFooter>
     </Card>
   );

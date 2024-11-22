@@ -37,6 +37,13 @@ function Comment({ reviewId, currentUserImg, currenUserId }: Props) {
     form.reset()
   }
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault()
+      form.handleSubmit(onSubmit)()
+    }
+  }
+
   return (
     <Form {...form}>
       <form className='comment-form' onSubmit={form.handleSubmit(onSubmit)}>
@@ -58,8 +65,10 @@ function Comment({ reviewId, currentUserImg, currenUserId }: Props) {
                 <Input
                   type='text'
                   {...field}
-                  placeholder='comment...'
+                  placeholder='Add a comment...'
                   className='no-focus text-light-1 outline-none'
+                  onKeyDown={handleKeyDown}
+                  autoCorrect='off'
                 />
               </FormControl>
             </FormItem>
