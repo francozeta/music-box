@@ -125,13 +125,14 @@ export async function createReview({
 
 async function fetchAllChildReviews(reviewId: string): Promise<any[]> {
   const childReviews = await Review.find({ parentId: reviewId })
+  let allDescendants = [...childReviews]
 
-  const descendantReviews = []
   for (const childReview of childReviews) {
     const descendants = await fetchAllChildReviews(childReview._id)
-    descendantReviews.push(childReview, ...descendants)
+    allDescendants = allDescendants.concat(descendants)
   }
-  return descendantReviews
+
+  return allDescendants
 }
 
 export async function deleteReview(id: string, path: string): Promise<void> {
@@ -149,32 +150,33 @@ export async function deleteReview(id: string, path: string): Promise<void> {
     //Get all descendant review IDs including the main review ID and child reviews IDs
     const descendantReviewsIds = [
       id,
-      ...descendantReviews.map((review) => review._id)
+      ...descendantReviews.map((review) => review._id.toString())
     ]
 
     // Extract the authorIds and communityIds to update User and Community models respectively
+    const reviewsToDelete = [mainReview, ...descendantReviews]
     const uniqueAuthorIds = new Set(
-      [
-        ...descendantReviews.map((review) => review.author?._id?.toString()),  // Use optional chaining to handle possible undefined values
-        mainReview.author?._id?.toString()
-      ].filter((id) => id !== undefined)
+      reviewsToDelete
+        .map((review) => review.author?._id?.toString())
+        .filter((id): id is string => id !== undefined)
     )
 
     const uniqueCommunityIds = new Set(
-      [
-        descendantReviews.map((review) => review.community?._id?.toString()), // Use optional chaining to handle possible undefined values
-        mainReview.community?._id?.toString()
-      ].filter((id) => id !== undefined)
+      reviewsToDelete
+        .map((review) => review.community?._id?.toString())
+        .filter((id): id is string => id !== undefined)
     )
 
     // Recursively delete child threads and their descendants
     await Review.deleteMany({ _id: { $in: descendantReviewsIds } });
 
-    // Update User model
-    await User.updateMany(
-      { _id: { $in: Array.from(uniqueAuthorIds) } },
-      { $pull: { threads: { $in: descendantReviewsIds } } }
-    );
+    // Update User model - remove specific review references
+    for (const userId of uniqueAuthorIds) {
+      await User.updateOne(
+        { _id: userId },
+        { $pull: { reviews: { $in: descendantReviewsIds } } }
+      )
+    }
 
     // Update Community model
     await Community.updateMany(
@@ -185,12 +187,11 @@ export async function deleteReview(id: string, path: string): Promise<void> {
     revalidatePath(path)
 
   } catch (err) {
-    //@ts-expect-error ***err.message***
+    //@ts-expect-error **err.message**
     throw new Error(`Failed to delete review: ${err.message}`)
 
   }
 }
-
 export async function fetchReviewById(reviewId: string) {
   connectToDB()
   try {

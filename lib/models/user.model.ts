@@ -16,12 +16,19 @@ const userSchema = new mongoose.Schema({
   },
   image: String,
   bio: String,
-  reviews: [ 
+  reviews: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Review'
     }
   ],
+  reposts: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Review',
+    default: []
+
+  }],
+
   onboarded: {
     type: Boolean,
     default: false
