@@ -278,3 +278,57 @@ export async function addCommentToReview(
     throw new Error('Unable to add comment')
   }
 }
+
+export async function likeReview(reviewId: string, userId: string) {
+  try {
+    connectToDB()
+
+    const review = await Review.findById(reviewId)
+    const user = await User.findOne({ id: userId })
+
+    if (!review) {
+      throw new Error('Review not found')
+    }
+
+    if (!user) {
+      throw new Error('User not found')
+    }
+
+    // Verificar si el usuario ya ha dado like
+    const alreadyLiked = review.likes.includes(user._id)
+
+    if (alreadyLiked) {
+      // Si ya dio like, quitarlo
+      review.likes = review.likes.filter((id: any) => !id.equals(user._id))
+    } else {
+      // Si no ha dado like, agregarlo
+      review.likes.push(user._id)
+    }
+
+    await review.save()
+
+    return { success: true, liked: !alreadyLiked }
+  } catch (err) {
+    //@ts-expect-error ***err.message***
+    console.error(`Error while liking review: ${err.message}`)
+    throw new Error('Unable to like review')
+  }
+}
+
+export async function getLikesCount(reviewId: string) {
+  try {
+    connectToDB()
+
+    const review = await Review.findById(reviewId)
+
+    if (!review) {
+      throw new Error('Review not found')
+    }
+
+    return { count: review.likes.length }
+  } catch (err) {
+    //@ts-expect-error ***err.message***
+    console.error(`Error while getting likes count: ${err.message}`)
+    throw new Error('Unable to get likes count')
+  }
+}

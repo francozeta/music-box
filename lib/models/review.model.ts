@@ -47,7 +47,11 @@ const ReviewSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Review'
     }
-  ]
+  ],
+  likes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
 })
 
 const Review = mongoose.models.Review || mongoose.model('Review', ReviewSchema)
