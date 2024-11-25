@@ -37,6 +37,7 @@ async function Page(props: { params: Promise<{ id: string }> }) {
           artist={review.artist}
           rating={review.rating}
           image={review.image}
+          likes={review.likes}
 
         />
       </div>

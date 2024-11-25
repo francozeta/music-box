@@ -48,6 +48,7 @@ export default async function Home(
                 artist={post.artist}
                 rating={post.rating}
                 image={post.image}
+                likes={post.likes}
 
               />
             ))}

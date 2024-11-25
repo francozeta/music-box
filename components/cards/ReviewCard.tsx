@@ -47,6 +47,7 @@ interface Props {
     };
   }[];
   isComment?: boolean;
+  likes?: string[];
 }
 
 function ReviewCard({
@@ -62,7 +63,8 @@ function ReviewCard({
   songTitle,
   artist,
   rating,
-  image
+  image,
+  likes = []
 }: Props) {
   /* [ Server ] Error: Maximum call stack size exceeded: DONE! */
 
@@ -132,7 +134,12 @@ function ReviewCard({
         </div>
       </CardContent>
       <CardFooter className="flex justify-between">
-        <FooterReview id={id.toString()} commentsCount={comments.length} />
+        <FooterReview
+          id={id.toString()}
+          commentsCount={comments.length}
+          likesCount={likes.length}
+          isLiked={likes.includes(currentUserId)}
+          currentUserId={currentUserId} />
       </CardFooter>
     </Card>
   );
@@ -140,10 +147,3 @@ function ReviewCard({
 
 export default ReviewCard
 
-{/* <DeleteReview
-reviewId={JSON.stringify(id)}
-currentUserId={currentUserId}
-authorId={author.id}
-parentId={parentId}
-isComment={isComment}
-/> */}

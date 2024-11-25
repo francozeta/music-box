@@ -29,6 +29,7 @@ interface Result {
       image: string,
     } | null,
     createdAt: string,
+    likes: string[],
     children: {
       author: {
         image: string,
@@ -84,7 +85,7 @@ async function ReviewsTab({ currentUserId, accountId, accountType }: Props) {
           artist={review.artist}
           rating={review.rating}
           image={review.image}
-
+          likes={review.likes}
         />
       ))}
     </section>
