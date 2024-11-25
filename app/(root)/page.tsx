@@ -49,7 +49,7 @@ export default async function Home(
                 rating={post.rating}
                 image={post.image}
                 likes={post.likes}
-
+                repostsCount={post.repostsCount}
               />
             ))}
           </>

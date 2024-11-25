@@ -4,6 +4,7 @@ import {
   Heart,
   Home,
   MessageSquare,
+  Repeat,
   Search,
   Tag,
   User,
@@ -48,7 +49,7 @@ export const sidebarLinks = [
 export const profileTabs = [
   { value: "reviews", label: "Reviews", icon: MessageSquare },
   { value: "replies", label: "Replies", icon: Users },
-  { value: "tagged", label: "Tagged", icon: Tag },
+  { value: "reposts", label: "Reposts", icon: Repeat },
 ];
 
 export const communityTabs = [

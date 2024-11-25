@@ -6,13 +6,15 @@ import { Heart, MessageCircle, Repeat, Send } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useState } from 'react';
-import { getLikesCount, likeReview } from '@/lib/actions/review.actions';
+import { getLikesCount, getRepostsCount, likeReview, repostReview } from '@/lib/actions/review.actions';
 
 interface FooterReviewProps {
   id: string;
   commentsCount: number;
   likesCount: number;
+  repostsCount: number;
   isLiked: boolean;
+  isReposted: boolean;
   currentUserId: string;
 }
 
@@ -20,12 +22,18 @@ export default function FooterReview({
   id,
   commentsCount,
   likesCount,
+  repostsCount,
   isLiked,
+  isReposted,
   currentUserId,
 }: FooterReviewProps) {
   const { toast } = useToast()
   const [likes, setLikes] = useState(likesCount);
   const [liked, setLiked] = useState(isLiked);
+
+  const [reposts, setReposts] = useState(repostsCount);
+  const [reposted, setReposted] = useState(isReposted);
+
 
   const copyReviewUrl = () => {
     const reviewUrl = `${window.location.origin}/review/${id}`;
@@ -49,8 +57,7 @@ export default function FooterReview({
       const result = await likeReview(id, currentUserId);
       if (result.success) {
         setLiked(result.liked);
-        const newCount = await getLikesCount(id);
-        setLikes(newCount.count);
+        setLikes(result.likesCount);
       }
     } catch (error) {
       console.error('Error al dar like:', error);
@@ -61,6 +68,26 @@ export default function FooterReview({
       })
     }
   };
+
+  const handleRepost = async () => {
+    try {
+      const result = await repostReview(id, currentUserId);
+      if (result.success) {
+        setReposted(result.reposted);
+        setReposts((prev) => (result.reposted ? prev + 1 : Math.max(0, prev - 1)));
+        toast({
+          title: result.reposted ? "Reposted!" : "Removed repost",
+          description: result.reposted
+            ? "This review has been added to your profile"
+            : "This review has been removed from your profile",
+        });
+      }
+    } catch (error) {
+      console.error('Error reposting review:', error);
+      toast({ title: "Error", description: "Failed to repost the review. Please try again.", variant: "destructive" });
+    }
+  };
+
 
   return (
     <>
@@ -98,13 +125,23 @@ export default function FooterReview({
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon" className="text-muted-foreground hover:bg-zinc-900 hover:text-zinc-100">
-              <Repeat className="h-4 w-4" />
+            <Button
+              variant="ghost"
+              size="icon"
+              className={`text-muted-foreground hover:bg-zinc-900 hover:text-zinc-100 ${reposted ? 'text-green-500' : ''
+                }`}
+              onClick={handleRepost}
+            >
+              <Repeat className={`h-4 w-4 ${reposted ? 'fill-current' : ''}`} />
+              {reposts > 0 && (
+                <span className="ml-1 text-xs">{reposts}</span>
+              )}
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Repost</TooltipContent>
+          <TooltipContent>{reposted ? 'Remove Repost' : 'Repost'}</TooltipContent>
         </Tooltip>
       </TooltipProvider>
+
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>

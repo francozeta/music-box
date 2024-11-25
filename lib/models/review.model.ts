@@ -52,6 +52,10 @@ const ReviewSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   }],
+  repostsCount: {
+    type: Number,
+    default: 0
+  }
 })
 
 const Review = mongoose.models.Review || mongoose.model('Review', ReviewSchema)

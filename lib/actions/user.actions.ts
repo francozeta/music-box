@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { FilterQuery, SortOrder } from 'mongoose';
-import { connectToDB } from '../mongoose'; 
+import { connectToDB } from '../mongoose';
 
 import User from '../models/user.model';
 import Review from '../models/review.model';
@@ -66,38 +66,66 @@ export async function fetchUserPosts(userId: string) {
   try {
     await connectToDB()
 
-    // Find all reviews authored by the user with the given userId
-    const reviews = await User.findOne({ id: userId }).populate({
-      path: 'reviews',
-      model: Review,
-      populate: [
-        // NEW: In the query, we populate the author field to get the necessary details.
-        {
-          path: 'author', // Este es el campo que contiene el ID del autor
-          model: User,
-          select: 'name image id', // Incluye los subcampos necesarios
-        },
-        {
-          path: 'community',
-          model: Community,
-          select: 'name id image _id' // Select the 'name' and '_id' fields from the 'Community' model
-        },
-        {
-          path: 'children',
-          model: Review,
-          populate: {
+    const user = await User.findOne({ id: userId })
+      .populate({
+        path: 'reviews',
+        model: Review,
+        populate: [
+          {
             path: 'author',
             model: User,
-            select: 'name image id _id' // Select the 'name' and '_id' fields from the 'User' model
+            select: 'name image id',
+          },
+          {
+            path: 'community',
+            model: Community,
+            select: 'name id image _id'
+          },
+          {
+            path: 'children',
+            model: Review,
+            populate: {
+              path: 'author',
+              model: User,
+              select: 'name image id _id'
+            }
           }
-        }
-      ]
-    })
-    return reviews
-  } catch (err) {
-    console.error(`Error fetching user reviews : ${err}`)
-    throw err
+        ]
+      })
+      .populate({
+        path: 'reposts',
+        model: Review,
+        populate: [
+          {
+            path: 'author',
+            model: User,
+            select: 'name image id',
+          },
+          {
+            path: 'community',
+            model: Community,
+            select: 'name id image _id'
+          },
+          {
+            path: 'children',
+            model: Review,
+            populate: {
+              path: 'author',
+              model: User,
+              select: 'name image id _id'
+            }
+          }
+        ]
+      })
 
+    return {
+      ...user._doc,
+      reviews: user.reviews,
+      reposts: user.reposts
+    }
+  } catch (err) {
+    console.error(`Error fetching user posts: ${err}`)
+    throw err
   }
 }
 // Almost similar to Review (search + pagination) and Community (search + pagination)

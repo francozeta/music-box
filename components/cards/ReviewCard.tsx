@@ -48,6 +48,7 @@ interface Props {
   }[];
   isComment?: boolean;
   likes?: string[];
+  repostsCount?: number;
 }
 
 function ReviewCard({
@@ -64,7 +65,8 @@ function ReviewCard({
   artist,
   rating,
   image,
-  likes = []
+  likes,
+  repostsCount,
 }: Props) {
   /* [ Server ] Error: Maximum call stack size exceeded: DONE! */
 
@@ -137,9 +139,12 @@ function ReviewCard({
         <FooterReview
           id={id.toString()}
           commentsCount={comments.length}
-          likesCount={likes.length}
-          isLiked={likes.includes(currentUserId)}
-          currentUserId={currentUserId} />
+          likesCount={likes?.length || 0} 
+          repostsCount={repostsCount || 0} 
+          isLiked={likes?.includes(currentUserId) || false} 
+          isReposted={currentUserId ? (repostsCount || 0) > 0 : false}
+          currentUserId={currentUserId}
+        />
       </CardFooter>
     </Card>
   );

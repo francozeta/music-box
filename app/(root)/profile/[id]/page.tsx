@@ -1,4 +1,5 @@
 import ProfileHeader from '@/components/shared/ProfileHeader';
+import RepostsTab from '@/components/shared/RepostsTab';
 import ReviewsTab from '@/components/shared/ReviewsTab';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { profileTabs } from '@/constants';
@@ -50,7 +51,7 @@ async function Page(props: { params: Promise<{ id: string }> }) {
                 <ReviewsTab currentUserId={user.id} accountId={userInfo.id} accountType='User' />
               )}
               {tab.value === 'reposts' && (
-                <ReviewsTab currentUserId={user.id} accountId={userInfo.id} accountType='User' />
+                <RepostsTab currentUserId={user.id} accountId={userInfo.id}  />
               )}
             </TabsContent>
           ))}

@@ -19,7 +19,7 @@ export async function fetchPosts(pageNumber = 1, pageSize = 20) {
       .sort({ createdAt: 'desc' })
       .skip(skipAmount)
       .limit(pageSize)
-      .select('image songTitle artist rating createdAt text') // remove text from review model
+      .select('image songTitle artist rating createdAt text likes') // remove text from review model
       .populate({
         path: 'author',
         model: User
@@ -294,8 +294,7 @@ export async function likeReview(reviewId: string, userId: string) {
       throw new Error('User not found')
     }
 
-    // Verificar si el usuario ya ha dado like
-    const alreadyLiked = review.likes.includes(user._id)
+    const alreadyLiked = review.likes.some((id: any) => id.equals(user._id))
 
     if (alreadyLiked) {
       // Si ya dio like, quitarlo
@@ -307,7 +306,7 @@ export async function likeReview(reviewId: string, userId: string) {
 
     await review.save()
 
-    return { success: true, liked: !alreadyLiked }
+    return { success: true, liked: !alreadyLiked, likesCount: review.likes.length }
   } catch (err) {
     //@ts-expect-error ***err.message***
     console.error(`Error while liking review: ${err.message}`)
@@ -330,5 +329,64 @@ export async function getLikesCount(reviewId: string) {
     //@ts-expect-error ***err.message***
     console.error(`Error while getting likes count: ${err.message}`)
     throw new Error('Unable to get likes count')
+  }
+}
+
+// Add this new function to handle reposts
+export async function repostReview(reviewId: string, userId: string) {
+  try {
+    connectToDB()
+
+    const review = await Review.findById(reviewId)
+    const user = await User.findOne({ id: userId })
+
+    if (!review) {
+      throw new Error('Review not found')
+    }
+
+    if (!user) {
+      throw new Error('User not found')
+    }
+
+    const hasReposted = user.reposts.includes(review._id)
+
+    if (hasReposted) {
+      // Remove the repost
+      user.reposts = user.reposts.filter(
+        (id: any) => !id.equals(review._id)
+      )
+      // Decrease repost count
+      review.repostsCount = Math.max(0, review.repostsCount - 1)
+    } else {
+      // Add the repost
+      user.reposts.push(review._id)
+      // Increase repost count
+      review.repostsCount = (review.repostsCount || 0) + 1
+    }
+
+    await Promise.all([user.save(), review.save()])
+
+    return { success: true, reposted: !hasReposted }
+  } catch (err) {
+    //@ts-expect-error ***err.message***
+    console.error(`Error while reposting review: ${err.message}`)
+    throw new Error('Unable to repost review')
+  }
+}
+
+// Add this function to get repost count
+export async function getRepostsCount(reviewId: string) {
+  try {
+    connectToDB()
+
+    const repostsCount = await User.countDocuments({
+      reposts: reviewId
+    })
+
+    return { count: repostsCount }
+  } catch (err) {
+    //@ts-expect-error ***err.message***
+    console.error(`Error while getting reposts count: ${err.message}`)
+    throw new Error('Unable to get reposts count')
   }
 }
