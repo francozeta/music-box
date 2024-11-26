@@ -14,7 +14,7 @@ export async function fetchPosts(pageNumber = 1, pageSize = 20) {
       .sort({ createdAt: 'desc' })
       .skip(skipAmount)
       .limit(pageSize)
-      .select('image songTitle artist rating createdAt text likes reposts') // remove text from review model
+      .select('image songTitle artist rating createdAt text likes reposts') // select only those fields that we need to the <ReviewCard/>
       .populate({
         path: 'author',
         model: User
@@ -246,22 +246,22 @@ export async function likeReview(reviewId: string, userId: string) {
     if (!user) {
       throw new Error('User not found')
     }
-    const alreadyLiked = review.likes.some((id: any) => id.equals(user._id))
+    const alreadyLiked = review.likes.includes(user._id)
     if (alreadyLiked) {
-      // Si ya dio like, quitarlo
       review.likes = review.likes.filter((id: any) => !id.equals(user._id))
     } else {
-      // Si no ha dado like, agregarlo
       review.likes.push(user._id)
     }
     await review.save()
+    revalidatePath('/') // Revalidate the home page
     return { success: true, liked: !alreadyLiked, likesCount: review.likes.length }
   } catch (err) {
-    //@ts-expect-error ***err.message***
-    console.error(`Error while liking review: ${err.message}`)
+    console.error(`Error while liking review: ${err}`)
     throw new Error('Unable to like review')
   }
 }
+
+
 export async function getLikesCount(reviewId: string) {
   try {
     connectToDB()
@@ -290,19 +290,14 @@ export async function repostReview(reviewId: string, userId: string) {
     }
     const hasReposted = review.reposts.includes(user._id)
     if (hasReposted) {
-      // Remove the repost
-      review.reposts = review.reposts.filter(
-        (id: any) => !id.equals(user._id)
-      )
-      user.reposts = user.reposts.filter(
-        (id: any) => !id.equals(review._id)
-      )
+      review.reposts = review.reposts.filter((id: any) => !id.equals(user._id))
+      user.reposts = user.reposts.filter((id: any) => !id.equals(review._id))
     } else {
-      // Add the repost
       review.reposts.push(user._id)
       user.reposts.push(review._id)
     }
     await Promise.all([user.save(), review.save()])
+    revalidatePath('/') // Revalidate the home page
     return { success: true, reposted: !hasReposted, repostsCount: review.reposts.length }
   } catch (err) {
     console.error(`Error while reposting review: ${err}`)

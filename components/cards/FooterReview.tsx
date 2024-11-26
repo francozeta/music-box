@@ -11,28 +11,28 @@ import { getLikesCount, getRepostsCount, likeReview, repostReview } from '@/lib/
 interface FooterReviewProps {
   id: string;
   commentsCount: number;
-  likesCount: number;
-  repostsCount: number;
-  isLiked: boolean;
-  isReposted: boolean;
+  initialLikesCount: number;
+  initialRepostsCount: number;
+  initialIsLiked: boolean;
+  initialIsReposted: boolean;
   currentUserId: string;
 }
 
 export default function FooterReview({
   id,
   commentsCount,
-  likesCount,
-  repostsCount,
-  isLiked,
-  isReposted,
+  initialLikesCount,
+  initialRepostsCount,
+  initialIsLiked,
+  initialIsReposted,
   currentUserId,
 }: FooterReviewProps) {
   const { toast } = useToast()
-  const [likes, setLikes] = useState(likesCount);
-  const [liked, setLiked] = useState(isLiked);
+  const [likes, setLikes] = useState(initialLikesCount)
+  const [liked, setLiked] = useState(initialIsLiked)
 
-  const [reposts, setReposts] = useState(repostsCount);
-  const [reposted, setReposted] = useState(isReposted);
+  const [reposts, setReposts] = useState(initialRepostsCount)
+  const [reposted, setReposted] = useState(initialIsReposted)
 
 
   const copyReviewUrl = () => {
@@ -60,7 +60,7 @@ export default function FooterReview({
         setLikes(result.likesCount);
       }
     } catch (error) {
-      console.error('Error al dar like:', error);
+      console.error('Error liking: ', error);
       toast({
         title: "Error",
         description: "Failed to like the review. Please try again.",
@@ -108,6 +108,7 @@ export default function FooterReview({
           <TooltipContent>{liked ? 'Unlike' : 'Like'}</TooltipContent>
         </Tooltip>
       </TooltipProvider>
+
       <Link href={`/review/${id}`}>
         <TooltipProvider>
           <Tooltip>
@@ -123,14 +124,14 @@ export default function FooterReview({
           </Tooltip>
         </TooltipProvider>
       </Link>
+
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
               variant="ghost"
               size="icon"
-              className={`text-muted-foreground hover:bg-zinc-900 hover:text-zinc-100 ${reposted ? 'text-green-500' : ''
-                }`}
+              className={`text-muted-foreground hover:bg-zinc-900 hover:text-zinc-100 ${reposted ? 'text-green-500' : ''}`}
               onClick={handleRepost}
             >
               <Repeat className={`h-4 w-4 ${reposted ? 'fill-current' : ''}`} />

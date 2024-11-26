@@ -12,6 +12,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import DeleteReview from '../forms/DeleteReview';
 import FooterReview from './FooterReview';
+import { useState } from 'react';
 
 
 
@@ -67,9 +68,12 @@ function ReviewCard({
   likes,
   reposts,
 }: Props) {
-  /* [ Server ] Error: Maximum call stack size exceeded: DONE! */
+
+  const isLiked = likes.includes(currentUserId);
+  const isReposted = reposts.includes(currentUserId);
 
   return (
+    
     <Card className="w-full max-w-2xl bg-zinc-900 border-zinc-700 ">
       <CardHeader className="flex flex-row items-center gap-4">
         <Avatar>
@@ -135,13 +139,13 @@ function ReviewCard({
         </div>
       </CardContent>
       <CardFooter className="flex justify-between">
-      <FooterReview
+        <FooterReview
           id={id.toString()}
           commentsCount={comments.length}
-          likesCount={likes.length}
-          repostsCount={reposts.length} // Cambiado a reposts.length
-          isLiked={likes.includes(currentUserId)}
-          isReposted={reposts.includes(currentUserId)} // Cambiado para usar reposts
+          initialLikesCount={likes.length}
+          initialRepostsCount={reposts.length}
+          initialIsLiked={isLiked}
+          initialIsReposted={isReposted}
           currentUserId={currentUserId}
         />
       </CardFooter>
