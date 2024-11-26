@@ -38,7 +38,7 @@ async function Page(props: { params: Promise<{ id: string }> }) {
           rating={review.rating}
           image={review.image}
           likes={review.likes}
-          repostsCount={review.repostsCount}
+          reposts={review.reposts}
         />
       </div>
 

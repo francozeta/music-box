@@ -27,6 +27,7 @@ interface Result {
     rating: number,
     image: string,
     likes: string[],
+    reposts: string[],
     children: {
       author: {
         image: string,
@@ -69,6 +70,7 @@ async function RepostsTab({ currentUserId, accountId }: Props) {
             rating={review.rating}
             image={review.image}
             likes={review.likes}
+            reposts={review.reposts}
           />
         </div>
       ))}

@@ -74,7 +74,7 @@ export default function FooterReview({
       const result = await repostReview(id, currentUserId);
       if (result.success) {
         setReposted(result.reposted);
-        setReposts((prev) => (result.reposted ? prev + 1 : Math.max(0, prev - 1)));
+        setReposts(result.repostsCount);
         toast({
           title: result.reposted ? "Reposted!" : "Removed repost",
           description: result.reposted
@@ -87,6 +87,7 @@ export default function FooterReview({
       toast({ title: "Error", description: "Failed to repost the review. Please try again.", variant: "destructive" });
     }
   };
+
 
 
   return (

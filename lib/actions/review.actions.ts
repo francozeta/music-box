@@ -14,7 +14,7 @@ export async function fetchPosts(pageNumber = 1, pageSize = 20) {
       .sort({ createdAt: 'desc' })
       .skip(skipAmount)
       .limit(pageSize)
-      .select('image songTitle artist rating createdAt text likes') // remove text from review model
+      .select('image songTitle artist rating createdAt text likes reposts') // remove text from review model
       .populate({
         path: 'author',
         model: User
@@ -288,39 +288,38 @@ export async function repostReview(reviewId: string, userId: string) {
     if (!user) {
       throw new Error('User not found')
     }
-    const hasReposted = user.reposts.includes(review._id)
+    const hasReposted = review.reposts.includes(user._id)
     if (hasReposted) {
       // Remove the repost
+      review.reposts = review.reposts.filter(
+        (id: any) => !id.equals(user._id)
+      )
       user.reposts = user.reposts.filter(
         (id: any) => !id.equals(review._id)
       )
-      // Decrease repost count
-      review.repostsCount = Math.max(0, review.repostsCount - 1)
     } else {
       // Add the repost
+      review.reposts.push(user._id)
       user.reposts.push(review._id)
-      // Increase repost count
-      review.repostsCount = (review.repostsCount || 0) + 1
     }
     await Promise.all([user.save(), review.save()])
-    return { success: true, reposted: !hasReposted }
+    return { success: true, reposted: !hasReposted, repostsCount: review.reposts.length }
   } catch (err) {
-    //@ts-expect-error ***err.message***
-    console.error(`Error while reposting review: ${err.message}`)
+    console.error(`Error while reposting review: ${err}`)
     throw new Error('Unable to repost review')
   }
 }
-// Add this function to get repost count
+
 export async function getRepostsCount(reviewId: string) {
   try {
     connectToDB()
-    const repostsCount = await User.countDocuments({
-      reposts: reviewId
-    })
-    return { count: repostsCount }
+    const review = await Review.findById(reviewId)
+    if (!review) {
+      throw new Error('Review not found')
+    }
+    return { count: review.reposts.length }
   } catch (err) {
-    //@ts-expect-error ***err.message***
-    console.error(`Error while getting reposts count: ${err.message}`)
+    console.error(`Error while getting reposts count: ${err}`)
     throw new Error('Unable to get reposts count')
   }
 }

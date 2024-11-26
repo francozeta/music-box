@@ -9,12 +9,11 @@ interface Result {
   id: string,
   image: string,
   reviews: {
-    /* ***new */
     songTitle: string,
     artist: string,
     rating: number,
     image: string,
-    /* ***new */
+
     _id: string,
     text: string,
     parentId: string | null,
@@ -30,6 +29,7 @@ interface Result {
     } | null,
     createdAt: string,
     likes: string[],
+    reposts: string[],
     children: {
       author: {
         image: string,
@@ -86,6 +86,7 @@ async function ReviewsTab({ currentUserId, accountId, accountType }: Props) {
           rating={review.rating}
           image={review.image}
           likes={review.likes}
+          reposts={review.reposts}
         />
       ))}
     </section>
