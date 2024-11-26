@@ -29,7 +29,6 @@ interface Props {
     image: string;
     id: string;
   };
-  // ***new***
   songTitle: string,
   artist: string,
   rating: number,
@@ -72,8 +71,11 @@ function ReviewCard({
   const isLiked = likes.includes(currentUserId);
   const isReposted = reposts.includes(currentUserId);
 
+  /*   console.log(currentUserId)
+    console.log(isLiked) */
+
   return (
-    
+
     <Card className="w-full max-w-2xl bg-zinc-900 border-zinc-700 ">
       <CardHeader className="flex flex-row items-center gap-4">
         <Avatar>

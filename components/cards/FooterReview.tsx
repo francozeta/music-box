@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast"
 import { Heart, MessageCircle, Repeat, Send } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getLikesCount, getRepostsCount, likeReview, repostReview } from '@/lib/actions/review.actions';
 
 interface FooterReviewProps {
@@ -34,6 +34,11 @@ export default function FooterReview({
   const [reposts, setReposts] = useState(initialRepostsCount)
   const [reposted, setReposted] = useState(initialIsReposted)
 
+  useEffect(() => {
+    setLiked(initialIsLiked);
+    setReposted(initialIsReposted);
+  }, [initialIsLiked, initialIsReposted]);
+
 
   const copyReviewUrl = () => {
     const reviewUrl = `${window.location.origin}/review/${id}`;
@@ -52,7 +57,32 @@ export default function FooterReview({
     });
   };
 
+  /*   const handleLike = async () => {
+      try {
+        const result = await likeReview(id, currentUserId);
+        if (result.success) {
+          setLiked(result.liked);
+          setLikes(result.likesCount);
+        }
+      } catch (error) {
+        console.error('Error liking: ', error);
+        toast({
+          title: "Error",
+          description: "Failed to like the review. Please try again.",
+          variant: "destructive",
+        })
+      }
+    }; */
   const handleLike = async () => {
+    if (!currentUserId) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to like a review.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const result = await likeReview(id, currentUserId);
       if (result.success) {
@@ -60,16 +90,44 @@ export default function FooterReview({
         setLikes(result.likesCount);
       }
     } catch (error) {
-      console.error('Error liking: ', error);
+      console.error('Error liking review:', error);
       toast({
         title: "Error",
         description: "Failed to like the review. Please try again.",
         variant: "destructive",
-      })
+      });
     }
-  };
+  }
+
+  /*   const handleRepost = async () => {
+      try {
+        const result = await repostReview(id, currentUserId);
+        if (result.success) {
+          setReposted(result.reposted);
+          setReposts(result.repostsCount);
+          toast({
+            title: result.reposted ? "Reposted!" : "Removed repost",
+            description: result.reposted
+              ? "This review has been added to your profile"
+              : "This review has been removed from your profile",
+          });
+        }
+      } catch (error) {
+        console.error('Error reposting review:', error);
+        toast({ title: "Error", description: "Failed to repost the review. Please try again.", variant: "destructive" });
+      }
+    }; */
 
   const handleRepost = async () => {
+    if (!currentUserId) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to repost a review.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const result = await repostReview(id, currentUserId);
       if (result.success) {
@@ -84,9 +142,14 @@ export default function FooterReview({
       }
     } catch (error) {
       console.error('Error reposting review:', error);
-      toast({ title: "Error", description: "Failed to repost the review. Please try again.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Failed to repost the review. Please try again.",
+        variant: "destructive",
+      });
     }
   };
+
 
 
 

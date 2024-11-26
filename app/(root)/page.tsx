@@ -25,6 +25,8 @@ export default async function Home(
   )
 
 
+  console.log('CURREN USER ID: PAGE/HOME: ',user.id)
+
   return (
     <>
       <h1 className='head-text text-left'>Home</h1>

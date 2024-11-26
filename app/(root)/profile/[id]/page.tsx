@@ -16,6 +16,8 @@ async function Page(props: { params: Promise<{ id: string }> }) {
   const userInfo = await fetchUser(params.id)
   if (!userInfo?.onboarded) redirect('/onboarding')
 
+
+  console.log('CURREN USER ID: PAGE/PROFILE/[ID]: ', user.id)
   return (
     <section>
       <ProfileHeader
@@ -51,7 +53,7 @@ async function Page(props: { params: Promise<{ id: string }> }) {
                 <ReviewsTab currentUserId={user.id} accountId={userInfo.id} accountType='User' />
               )}
               {tab.value === 'reposts' && (
-                <RepostsTab currentUserId={user.id} accountId={userInfo.id}  />
+                <RepostsTab currentUserId={user.id} accountId={userInfo.id} />
               )}
             </TabsContent>
           ))}
