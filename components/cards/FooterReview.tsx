@@ -99,25 +99,6 @@ export default function FooterReview({
     }
   }
 
-  /*   const handleRepost = async () => {
-      try {
-        const result = await repostReview(id, currentUserId);
-        if (result.success) {
-          setReposted(result.reposted);
-          setReposts(result.repostsCount);
-          toast({
-            title: result.reposted ? "Reposted!" : "Removed repost",
-            description: result.reposted
-              ? "This review has been added to your profile"
-              : "This review has been removed from your profile",
-          });
-        }
-      } catch (error) {
-        console.error('Error reposting review:', error);
-        toast({ title: "Error", description: "Failed to repost the review. Please try again.", variant: "destructive" });
-      }
-    }; */
-
   const handleRepost = async () => {
     if (!currentUserId) {
       toast({
@@ -151,8 +132,6 @@ export default function FooterReview({
   };
 
 
-
-
   return (
     <>
       <TooltipProvider>
@@ -165,7 +144,9 @@ export default function FooterReview({
               onClick={handleLike}
             >
               <Heart className={`h-4 w-4 ${liked ? 'fill-current' : ''}`} />
-              <span className="ml-1 text-xs">{likes}</span>
+              {likes > 0 && (
+                  <span className="ml-1 text-xs">{likes}</span>
+                )}
             </Button>
           </TooltipTrigger>
           <TooltipContent>{liked ? 'Unlike' : 'Like'}</TooltipContent>
