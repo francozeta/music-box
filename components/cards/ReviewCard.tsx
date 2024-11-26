@@ -138,9 +138,9 @@ function ReviewCard({
         <FooterReview
           id={id.toString()}
           commentsCount={comments.length}
-          likesCount={likes?.length || 0} 
-          repostsCount={repostsCount || 0} 
-          isLiked={likes?.includes(currentUserId) || false} 
+          likesCount={likes?.length || 0}
+          repostsCount={repostsCount || 0}
+          isLiked={likes?.includes(currentUserId) || false}
           isReposted={currentUserId ? (repostsCount || 0) > 0 : false}
           currentUserId={currentUserId}
         />

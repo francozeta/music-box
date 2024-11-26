@@ -1,17 +1,13 @@
 'use server'
-
 import { revalidatePath } from 'next/cache';
 import { FilterQuery, SortOrder } from 'mongoose';
 import { connectToDB } from '../mongoose';
-
 import User from '../models/user.model';
 import Review from '../models/review.model';
 import Community from '../models/community.model';
-
 export async function fetchUser(userId: string) {
   try {
     await connectToDB()
-
     return await User.findOne({ id: userId }).populate({
       path: 'communities',
       model: Community
@@ -21,7 +17,6 @@ export async function fetchUser(userId: string) {
     throw new Error(`Failed to fetch user: ${err.message}`)
   }
 }
-
 interface Params {
   userId: string,
   username: string,
@@ -40,7 +35,6 @@ export async function updateUser({
 }: Params): Promise<void> {
   try {
     await connectToDB()
-
     await User.findOneAndUpdate(
       { id: userId },
       {
@@ -52,20 +46,17 @@ export async function updateUser({
       },
       { upsert: true }
     )
-
     if (path === '/profile/edit') {
       revalidatePath(path)
     }
   } catch (err) {
     //@ts-expect-error ***err.message***
     throw new Error(`Failed to create/update user: ${err.message}`)
-
   }
 }
 export async function fetchUserPosts(userId: string) {
   try {
     await connectToDB()
-
     const user = await User.findOne({ id: userId })
       .populate({
         path: 'reviews',
@@ -117,7 +108,6 @@ export async function fetchUserPosts(userId: string) {
           }
         ]
       })
-
     return {
       ...user._doc,
       reviews: user.reviews,
@@ -145,18 +135,14 @@ export async function fetchUsers({
   try {
     /* LINE:::===:::112:::===::: */
     connectToDB()
-
     // Calculate the number of users to skip based on the page number and page size.
     const skipAmount = (pageNumber - 1) * pageSize
-
     // Create a case-insensitive regular expression for the provided search string.
     const regex = new RegExp(searchString, 'i')
-
     // Create an initial query object to filter users.
     const query: FilterQuery<typeof User> = {
       id: { $ne: userId }, // Exclude the current user from the search results.
     }
-
     // If the search string is not empty, add the $or operator to match either username or name fields.
     if (searchString.trim() !== '') {
       query.$or = [
@@ -164,23 +150,17 @@ export async function fetchUsers({
         { name: { $regex: regex } }
       ]
     }
-
     // Define the sort options for the fetched users based on createdAt field and provided sort order.
     const sortOptions = { createdAt: sortBy }
-
     const usersQuery = User.find(query)
       .sort(sortOptions)
       .skip(skipAmount)
       .limit(pageSize)
-
     // Count the total number of users that match the search criteria (without pagination).
     const totalUsersCount = await User.countDocuments(query)
-
     const users = await usersQuery.exec()
-
     // Check if there are more users beyond the current page.
     const isNext = totalUsersCount > skipAmount + users.length
-
     return { users, isNext }
   } catch (err) {
     console.error(`Error fetching users: ${err}`)
@@ -190,15 +170,12 @@ export async function fetchUsers({
 export async function getActivity(userId: string) {
   try {
     await connectToDB()
-
     // Find all reviews created by the user
     const userReviews = await Review.find({ author: userId })
-
     // Collect all the child review ids (replies) from the 'children' field of each user thread
     const childReviewIds = userReviews.reduce((acc, userReview) => {
       return acc.concat(userReview.children)
     }, [])
-
     // Find and return the child threads (replies) excluding the ones created by the same user
     const replies = await Review.find({
       _id: { $in: childReviewIds },
@@ -208,7 +185,6 @@ export async function getActivity(userId: string) {
       model: User,
       select: 'name image _id'
     })
-
     return replies
   } catch (err) {
     console.error(`Error fetching replies: ${err}`)
