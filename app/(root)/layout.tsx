@@ -9,6 +9,8 @@ import LeftSidebar from '@/components/shared/LeftSidebar';
 import RightSidebar from '@/components/shared/RightSidebar';
 import Botttombar from '@/components/shared/Botttombar';
 import { Toaster } from '@/components/ui/toaster';
+import { Suspense } from 'react';
+import Loading from './loading';
 
 const geistSans = localFont({
   src: "../fonts/GeistVF.woff",
@@ -41,16 +43,18 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased `}
         >
-          <Topbar />
-          <main className='flex flex-row'>
-            <LeftSidebar />
-            <section className='main-container'>
-              <div className='w-full max-w-4xl'>{children}</div>
-            </section>
-            <RightSidebar />
-          </main>
-          <Toaster />
-          <Botttombar />
+          <Suspense fallback={<Loading />}>
+            <Topbar />
+            <main className='flex flex-row'>
+              <LeftSidebar />
+              <section className='main-container'>
+                <div className='w-full max-w-4xl'>{children}</div>
+              </section>
+              <RightSidebar />
+            </main>
+            <Toaster />
+            <Botttombar />
+          </Suspense>
         </body>
       </html>
     </ClerkProvider>
