@@ -3,8 +3,13 @@ import Pagination from '@/components/shared/Pagination';
 import { fetchPosts } from '@/lib/actions/review.actions';
 import { fetchUser } from '@/lib/actions/user.actions';
 import { currentUser } from '@clerk/nextjs/server';
+import { Metadata } from 'next';
 
 import { redirect } from 'next/navigation';
+
+export const metadata: Metadata = {
+  title: "Home | MusicBox",
+}
 
 export default async function Home(
   props: {

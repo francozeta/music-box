@@ -9,14 +9,15 @@ import LeftSidebar from '@/components/shared/LeftSidebar';
 import RightSidebar from '@/components/shared/RightSidebar';
 import Botttombar from '@/components/shared/Botttombar';
 import { Toaster } from '@/components/ui/toaster';
-import { Suspense } from 'react';
 import Loading from './loading';
+import { Suspense } from "react";
 
 const geistSans = localFont({
   src: "../fonts/GeistVF.woff",
   variable: "--font-geist-sans",
   weight: "100 900",
 });
+
 const geistMono = localFont({
   src: "../fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
@@ -24,9 +25,13 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "MusicBox",
+  title: {
+    template: "%s | MusicBox",
+    default: "MusicBox"
+  },
   description: "App dedicated to music reviewers",
 };
+console.log(metadata);
 
 export default function RootLayout({
   children,
@@ -41,7 +46,7 @@ export default function RootLayout({
     >
       <html lang="en">
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased `}
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
           <Suspense fallback={<Loading />}>
             <Topbar />

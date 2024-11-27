@@ -4,8 +4,28 @@ import Comment from '@/components/forms/Comment'
 import { fetchReviewById } from '@/lib/actions/review.actions'
 import { fetchUser } from '@/lib/actions/user.actions'
 import { currentUser } from '@clerk/nextjs/server'
-import Image from 'next/image'
+import { Metadata } from 'next'
+
 import { redirect } from 'next/navigation'
+
+interface Props {
+  params: { id: string }
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const review = await fetchReviewById(params.id)
+
+  if (!review) {
+    return {
+      title: "Review Not Found"
+    }
+  }
+
+  return {
+    title: `´${review.songTitle}´ review by ${review.author.name}`,
+    description: `Read ${review.author.name}'s review of "${review.songTitle}" by ${review.artist} on MusicBox`
+  }
+}
 
 async function Page(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;

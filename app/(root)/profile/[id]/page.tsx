@@ -5,7 +5,27 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { profileTabs } from '@/constants';
 import { fetchUser } from '@/lib/actions/user.actions';
 import { currentUser } from '@clerk/nextjs/server';
+import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
+
+interface Props {
+  params: { id: string }
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const user = await fetchUser(params.id)
+
+  if (!user) {
+    return {
+      title: "User Not Found"
+    }
+  }
+
+  return {
+    title: `${user.name}'s Profile`,
+    description: `Check out ${user.name}'s profile on MusicBox`
+  }
+}
 
 
 async function Page(props: { params: Promise<{ id: string }> }) {
