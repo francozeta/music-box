@@ -26,24 +26,26 @@ async function Page() {
       <section className='mt-10 flex flex-col gap-5'>
         {activity.length > 0 ? (
           <>
-            {activity.map((activity : any, index) => (
-              <Link key={`${activity.reviewId}-${index}`} href={`/review/${activity.reviewId}`}>
+            {activity.map((activity: any, index) => (
+              <Link key={`${activity.reviewId}-${index}`} href={`/review/${activity.reviewId}`} className='block'>
                 <article className='activity-card'>
-                  <Image
-                    src={activity.author.image}
-                    alt='user_logo'
-                    width={20}
-                    height={20}
-                    className='rounded-full object-cover'
-                  />
-                  <p className='!text-small-regular text-light-1'>
-                    <span className='mr-1 text-primary-500'>
-                      {activity.author.name}
-                    </span>{" "}
-                    {activity.type === 'reply' && 'replied to your review'}
-                    {activity.type === 'like' && 'liked your review'}
-                    {activity.type === 'repost' && 'reposted your review'}
-                  </p>
+                  <div className="flex items-center gap-3">
+                    <Image
+                      src={activity.author.image}
+                      alt='user_logo'
+                      width={20}
+                      height={20}
+                      className='rounded-full object-cover'
+                    />
+                    <p className='!text-small-regular text-light-1'>
+                      <span className='mr-1 text-primary-500'>
+                        {activity.author.name}
+                      </span>{" "}
+                      {activity.type === 'reply' && 'replied to your review'}
+                      {activity.type === 'like' && 'liked your review'}
+                      {activity.type === 'repost' && 'reposted your review'}
+                    </p>
+                  </div>
                 </article>
               </Link>
             ))}

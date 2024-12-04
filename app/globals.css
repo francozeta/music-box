@@ -16,7 +16,7 @@
 
   /* Activity */
   .activity-card {
-    @apply flex items-center gap-2 rounded-md bg-dark-2 px-7 py-4;
+    @apply p-4 rounded-lg bg-zinc-800/50 hover:bg-zinc-800 transition-colors
   }
 
   /* No Result */
