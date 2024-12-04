@@ -37,7 +37,7 @@ async function Page(props: { params: Promise<{ id: string }> }) {
   if (!userInfo?.onboarded) redirect('/onboarding')
 
 
-  console.log('CURREN USER ID: PAGE/PROFILE/[ID]: ', user.id)
+/*   console.log('CURREN USER ID: PAGE/PROFILE/[ID]: ', user.id) */
   return (
     <section>
       <ProfileHeader

@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   },
   description: "App dedicated to music reviewers",
 };
-console.log(metadata);
+/* console.log(metadata); */
 
 export default function RootLayout({
   children,

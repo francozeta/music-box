@@ -30,7 +30,7 @@ export default async function Home(
   )
 
 
-  console.log('CURREN USER ID: PAGE/HOME: ', user.id)
+/*   console.log('CURREN USER ID: PAGE/HOME: ', user.id) */
 
   return (
     <>
