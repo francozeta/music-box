@@ -170,24 +170,74 @@ export async function fetchUsers({
 export async function getActivity(userId: string) {
   try {
     await connectToDB()
+
     // Find all reviews created by the user
     const userReviews = await Review.find({ author: userId })
-    // Collect all the child review ids (replies) from the 'children' field of each user thread
+
+    // Collect all the child review ids (replies)
     const childReviewIds = userReviews.reduce((acc, userReview) => {
       return acc.concat(userReview.children)
     }, [])
-    // Find and return the child threads (replies) excluding the ones created by the same user
+
+    // Get replies, excluding those by the same user
     const replies = await Review.find({
       _id: { $in: childReviewIds },
-      author: { $ne: userId } // Exclude threads authored by the same 
+      author: { $ne: userId }
     }).populate({
       path: 'author',
       model: User,
       select: 'name image _id'
     })
-    return replies
+
+    // Get likes on user's reviews, excluding self-likes
+    const likes = await Review.find({
+      _id: { $in: userReviews.map(review => review._id) },
+      likes: { $ne: userId }
+    }).populate({
+      path: 'likes',
+      model: User,
+      select: 'name image _id'
+    })
+
+    // Get reposts of user's reviews, excluding self-reposts
+    const reposts = await Review.find({
+      _id: { $in: userReviews.map(review => review._id) },
+      reposts: { $ne: userId }
+    }).populate({
+      path: 'reposts',
+      model: User,
+      select: 'name image _id'
+    })
+
+    // Combine and format all activities
+    const activities = [
+      ...replies.map(reply => ({
+        type: 'reply',
+        createdAt: reply.createdAt,
+        author: reply.author,
+        reviewId: reply.parentId
+      })),
+      ...likes.flatMap(review =>
+        review.likes.map((user: any) => ({
+          type: 'like',
+          createdAt: review.createdAt,
+          author: user,
+          reviewId: review._id
+        }))
+      ),
+      ...reposts.flatMap(review =>
+        review.reposts.map((user: any) => ({
+          type: 'repost',
+          createdAt: review.createdAt,
+          author: user,
+          reviewId: review._id
+        }))
+      )
+    ].sort((a, b) => b.createdAt - a.createdAt)
+
+    return activities
   } catch (err) {
-    console.error(`Error fetching replies: ${err}`)
+    console.error(`Error fetching activity: ${err}`)
     throw err
   }
 }

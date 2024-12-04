@@ -26,8 +26,8 @@ async function Page() {
       <section className='mt-10 flex flex-col gap-5'>
         {activity.length > 0 ? (
           <>
-            {activity.map((activity) => (
-              <Link key={activity._id} href={`/review/${activity.parentId}`}>
+            {activity.map((activity : any, index) => (
+              <Link key={`${activity.reviewId}-${index}`} href={`/review/${activity.reviewId}`}>
                 <article className='activity-card'>
                   <Image
                     src={activity.author.image}
@@ -40,7 +40,9 @@ async function Page() {
                     <span className='mr-1 text-primary-500'>
                       {activity.author.name}
                     </span>{" "}
-                    replied to your review
+                    {activity.type === 'reply' && 'replied to your review'}
+                    {activity.type === 'like' && 'liked your review'}
+                    {activity.type === 'repost' && 'reposted your review'}
                   </p>
                 </article>
               </Link>
