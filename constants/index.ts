@@ -25,19 +25,14 @@ export const sidebarLinks = [
     label: "Search",
   },
   {
-    icon: Heart,
-    route: "/activity",
-    label: "Activity",
-  },
-  {
     icon: FilePlus,
     route: "/create-review",
     label: "Create Review",
   },
   {
-    icon: Globe,
-    route: "/communities",
-    label: "Communities",
+    icon: Heart,
+    route: "/activity",
+    label: "Activity",
   },
   {
     icon: User,
