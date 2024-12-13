@@ -4,6 +4,7 @@ import { LogOut } from '@geist-ui/icons'
 import { sidebarLinks } from '@/constants'
 import { SignedIn, SignOutButton, useUser } from '@clerk/nextjs'
 import { usePathname } from 'next/navigation'
+import { ContactSupport } from './ContactSupport'
 
 const LeftSidebar = () => {
   const user = useUser().user
@@ -30,7 +31,9 @@ const LeftSidebar = () => {
           )
         })}
       </div>
-
+      <div className="mt-6 px-6">
+        <ContactSupport />
+      </div>
       <div className="mt-10 px-6">
         <SignedIn>
           <SignOutButton redirectUrl='/sign-in'>
