@@ -44,7 +44,8 @@ const LeftSidebar = () => {
           </SignOutButton>
         </SignedIn>
       </div>
-    </section>)
+    </section>
+  )
 }
 
 export default LeftSidebar
